@@ -6,7 +6,7 @@
 #include <Adafruit_GFX.h>
 
 #define DST_PIN 3
-#define LIGHTSENSOR 4  // This is really A2 ;)
+#define LIGHTSENSOR A2  // This is really A2 ;)
 
 Adafruit_7segment matrix = Adafruit_7segment();
 Adafruit_24bargraph bar = Adafruit_24bargraph();
@@ -48,18 +48,13 @@ void setup() {
     EEPROM.put(0, now.unixtime());
   }
 
-  brightness = 16;
-  bar.setBrightness(brightness);
-  alpha4.setBrightness(brightness/2);
-  matrix.setBrightness(brightness);
+//  brightness = 16;
+//  bar.setBrightness(brightness);
+//  alpha4.setBrightness(brightness/2);
+//  matrix.setBrightness(brightness);
 }
 
 void loop() {
-//  brightness = analogRead(LIGHTSENSOR) / 64;
-//  bar.setBrightness(brightness);
-//  alpha4.setBrightness(brightness);
-//  matrix.setBrightness(brightness);
-  
   if ((metranome % 30) < 12) {
     bar.setBar(23 - b, LED_OFF);
     bar.setBar(b, LED_OFF);
@@ -91,6 +86,14 @@ void loop() {
   }
 
   if (metranome % 10 == 0) {
+    // Check the light levels from the light sensor,
+    // then set the screen birghtness to match
+    brightness = map(constrain(analogRead(LIGHTSENSOR), 0, 780), 0, 780, 0, 16);
+    bar.setBrightness(brightness);
+    alpha4.setBrightness(brightness / 3);
+    matrix.setBrightness(brightness);
+
+    // Check the DST switch for "Daylight Saveing Time" == true
     if (digitalRead(DST_PIN) == HIGH) {
       // Add one hour to the current Date/Time
       now = DateTime(rtc.now().unixtime() + 3600);
@@ -244,16 +247,19 @@ void loop() {
 //          break;
 //      }
 //    }
-
-    alpha4.writeDigitAscii(0, dateChar1);
-    alpha4.writeDigitAscii(1, dateChar2);
-    
-    if (day >= 10) {
-      alpha4.writeDigitAscii(2, ((char)(day / 10)) | 0x30);
+    if (brightness > 1) {
+      alpha4.writeDigitAscii(0, dateChar1);
+      alpha4.writeDigitAscii(1, dateChar2);
+      
+      if (day >= 10) {
+        alpha4.writeDigitAscii(2, ((char)(day / 10)) | 0x30);
+      } else {
+        alpha4.writeDigitRaw(2, 0x00);
+      }
+      alpha4.writeDigitAscii(3, (day % 10) | 0x30);
     } else {
-      alpha4.writeDigitRaw(2, 0x20);
+      alpha4.clear();
     }
-    alpha4.writeDigitAscii(3, (day % 10) | 0x30);
     alpha4.writeDisplay();
   }
 

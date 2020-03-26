@@ -1,3 +1,7 @@
+/**
+ * Designed to work with ATTinyCore:
+ * http://www.leonardomiliani.com/repository/package_leonardomiliani.com_index.json
+ */
 #include <TinyWireM.h>
 #include <TinyRTClib.h>
 #include <EEPROM.h>

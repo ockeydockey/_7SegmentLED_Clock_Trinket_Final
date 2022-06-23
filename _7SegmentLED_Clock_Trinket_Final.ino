@@ -1,10 +1,21 @@
 /**
- * Designed to work with ATTinyCore:
+ * Designed to work with ATTinyCore (Version 1.3.3):
  * http://www.leonardomiliani.com/repository/package_leonardomiliani.com_index.json
+ * 
+ * Board: "ATtiny25/45/85"
+ * millis()/micros(): "Enabled"
+ * Timer 1 Clock: "CPU"
+ * Clock: "8 MHz (internal)"
+ * Chip: "ATtiny85"
+ * Save EEPROM: "EEPROM retained"
+ * LTO (1.6.11+ only): "Enabled"
+ * B.O.D. Level: "B.O.D. Enables (4.3v)"
+ * 
+ * Programmer: "USBTinyISP"
  */
-#include <TinyWireM.h>
-#include <TinyRTClib.h>
-#include <EEPROM.h>
+#include <TinyWireM.h>  // Version 1.0.1
+#include <TinyRTClib.h> // Version 1.0.0
+#include <EEPROM.h>     // Version 2.0.0
 
 #include <Adafruit_LEDBackpack.h>
 #include <Adafruit_GFX.h>

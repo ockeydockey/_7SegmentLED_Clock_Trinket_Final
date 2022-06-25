@@ -22,6 +22,9 @@
 #include <Adafruit_LEDBackpack.h> // Version 1.1.6
 #include <Adafruit_GFX.h>         // Version 1.7.5
 
+#include "BinaryIIRFilter.h"
+#include "MillisTimer.h"
+
 #define DST_PIN 3
 #define LIGHTSENSOR A2  // This is really A2 ;)
 
@@ -29,16 +32,25 @@ Adafruit_7segment matrix = Adafruit_7segment();
 Adafruit_24bargraph bar = Adafruit_24bargraph();
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 
+/// @brief Low Pass Filter for light sensor ADC
+/// @details Data for this filter needs to be sampled at a consistent rate
+BinaryIIRFilter lightSensorLPF{3U};
+
+MillisTimer adcSampleTimer{50UL, true};
+MillisTimer dotsToggleTimer{500UL, true};
+MillisTimer dateTimeUpdateTimer{1000UL, true};
+MillisTimer barFrameTimer{100UL, true};
+MillisTimer barBlankingTimer{3000UL, false};
+
 RTC_DS1307 rtc;
 DateTime now;
 uint8_t hour;
 uint8_t minute;
 uint8_t dow;
 uint8_t day;
-byte dots = 0x02;
-byte b = 0;
-unsigned int metranome = 0;
-byte brightness;
+uint8_t dots = 0x02;
+uint8_t b = 0;
+uint8_t brightness;
 char dateChar1;
 char dateChar2;
 //byte dateToggle = 0;
@@ -65,33 +77,69 @@ void setup() {
     EEPROM.put(0, now.unixtime());
   }
 
-  //  brightness = 16;
-  //  bar.setBrightness(brightness);
-  //  alpha4.setBrightness(brightness/2);
-  //  matrix.setBrightness(brightness);
+  adcSampleTimer.start();
+  dotsToggleTimer.start();
+  dateTimeUpdateTimer.start();
+  barFrameTimer.start();
 }
 
 void loop() {
-  if ((metranome % 30) < 12) {
-    bar.setBar(23 - b, LED_OFF);
-    bar.setBar(b, LED_OFF);
-    bar.writeDisplay();
+  if (adcSampleTimer.process())
+  {
+    // Check the light levels from the light sensor,
+    // then set the screen birghtness to match
+    brightness = map(constrain(lightSensorLPF.addSample(analogRead(LIGHTSENSOR)), 0, 780), 0, 780, 0, 16);
+    bar.setBrightness(brightness);
+    alpha4.setBrightness(brightness / 3);
+    matrix.setBrightness(brightness);
 
-    b = (b + 1) % 12;
+    if (brightness > 1) {
+      alpha4.writeDigitAscii(0, dateChar1);
+      alpha4.writeDigitAscii(1, dateChar2);
 
-    bar.setBar(b, LED_YELLOW);
-    bar.setBar(23 - b, LED_YELLOW);
-    bar.writeDisplay();
-  } else {
-    b = 11;
-    bar.setBar(11, LED_OFF);
-    bar.setBar(12, LED_OFF);
-    bar.writeDisplay();
+      if (day >= 10) {
+        alpha4.writeDigitAscii(2, ((char)(day / 10)) | 0x30);
+      } else {
+        alpha4.writeDigitRaw(2, 0x00);
+      }
+      alpha4.writeDigitAscii(3, (day % 10) | 0x30);
+    } else {
+      alpha4.clear();
+    }
   }
 
+  if (barFrameTimer.process())
+  {
+    barBlankingTimer.process();
+    if (barBlankingTimer.isRunning())
+    {
+      bar.setBar(11, LED_OFF);
+      bar.setBar(12, LED_OFF);
+      bar.writeDisplay();
+    }
+    else
+    {
+      bar.setBar(23 - b, LED_OFF);
+      bar.setBar(b, LED_OFF);
+      bar.writeDisplay();
 
-  if (metranome % 5 == 0) {
-    // Inverts (flashes) the colon in the middle of the display
+      b = (b + 1);
+      if (b >= 12)
+      {
+        barBlankingTimer.start();
+        b = 0;
+      }
+      else
+      {
+        bar.setBar(b, LED_YELLOW);
+        bar.setBar(23 - b, LED_YELLOW);
+        bar.writeDisplay();        
+      }
+    }
+  }
+
+  // Inverts (flashes) the colon in the middle of the display
+  if (dotsToggleTimer.process()) {
     dots ^= 0x02;
 
     matrix.writeDigitNum(0, (uint8_t)(hour / 10), false);
@@ -102,14 +150,7 @@ void loop() {
     matrix.writeDisplay();
   }
 
-  if (metranome % 10 == 0) {
-    // Check the light levels from the light sensor,
-    // then set the screen birghtness to match
-    brightness = map(constrain(analogRead(LIGHTSENSOR), 0, 780), 0, 780, 0, 16);
-    bar.setBrightness(brightness);
-    alpha4.setBrightness(brightness / 3);
-    matrix.setBrightness(brightness);
-
+  if (dateTimeUpdateTimer.process()) {
     // Check the DST switch for "Daylight Saveing Time" == true
     if (digitalRead(DST_PIN) == HIGH) {
       // Add one hour to the current Date/Time
@@ -264,23 +305,7 @@ void loop() {
     //          break;
     //      }
     //    }
-    if (brightness > 1) {
-      alpha4.writeDigitAscii(0, dateChar1);
-      alpha4.writeDigitAscii(1, dateChar2);
-
-      if (day >= 10) {
-        alpha4.writeDigitAscii(2, ((char)(day / 10)) | 0x30);
-      } else {
-        alpha4.writeDigitRaw(2, 0x00);
-      }
-      alpha4.writeDigitAscii(3, (day % 10) | 0x30);
-    } else {
-      alpha4.clear();
-    }
+    
     alpha4.writeDisplay();
   }
-
-  metranome++;
-  metranome = metranome % 60;
-  delay(100);
 }

@@ -37,6 +37,7 @@ Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 BinaryIIRFilter lightSensorLPF{3U};
 
 MillisTimer adcSampleTimer{50UL, true};
+MillisTimer displayUpdateTimer{100UL, true};
 MillisTimer dotsToggleTimer{500UL, true};
 MillisTimer dateTimeUpdateTimer{1000UL, true};
 MillisTimer barFrameTimer{100UL, true};
@@ -51,8 +52,8 @@ uint8_t day;
 uint8_t dots = 0x02;
 uint8_t b = 0;
 uint8_t brightness;
-char dateChar1;
-char dateChar2;
+char dateChar1 = ' ';
+char dateChar2 = ' ';
 //byte dateToggle = 0;
 
 void setup() {
@@ -81,9 +82,11 @@ void setup() {
   dotsToggleTimer.start();
   dateTimeUpdateTimer.start();
   barFrameTimer.start();
+  displayUpdateTimer.start();
 }
 
 void loop() {
+  // Sample light sensor and set screen brightness
   if (adcSampleTimer.process())
   {
     // Check the light levels from the light sensor,
@@ -93,6 +96,7 @@ void loop() {
     alpha4.setBrightness(brightness / 3);
     matrix.setBrightness(brightness);
 
+    // Only display date if the brightness is above a certain level
     if (brightness > 1) {
       alpha4.writeDigitAscii(0, dateChar1);
       alpha4.writeDigitAscii(1, dateChar2);
@@ -108,6 +112,7 @@ void loop() {
     }
   }
 
+  // Larson scanner animation
   if (barFrameTimer.process())
   {
     barBlankingTimer.process();
@@ -115,13 +120,11 @@ void loop() {
     {
       bar.setBar(11, LED_OFF);
       bar.setBar(12, LED_OFF);
-      bar.writeDisplay();
     }
     else
     {
       bar.setBar(23 - b, LED_OFF);
       bar.setBar(b, LED_OFF);
-      bar.writeDisplay();
 
       b = (b + 1);
       if (b >= 12)
@@ -133,7 +136,6 @@ void loop() {
       {
         bar.setBar(b, LED_YELLOW);
         bar.setBar(23 - b, LED_YELLOW);
-        bar.writeDisplay();        
       }
     }
   }
@@ -147,9 +149,9 @@ void loop() {
     matrix.writeDigitRaw(2, dots);
     matrix.writeDigitNum(3, (uint8_t)(minute / 10), false);
     matrix.writeDigitNum(4, (minute % 10), false);
-    matrix.writeDisplay();
   }
 
+  // Update date/time display
   if (dateTimeUpdateTimer.process()) {
     // Check the DST switch for "Daylight Saveing Time" == true
     if (digitalRead(DST_PIN) == HIGH) {
@@ -189,7 +191,6 @@ void loop() {
     matrix.writeDigitNum(3, (uint8_t)(minute / 10), false);
     matrix.writeDigitNum(4, (minute % 10), false);
 
-    matrix.writeDisplay();
 
     //    dateToggle = ~ dateToggle;
     //    if (dateToggle == 0) {
@@ -306,6 +307,13 @@ void loop() {
     //      }
     //    }
     
+  }
+
+  // Only push data to the displays once every interval to prevent glitching
+  if (displayUpdateTimer.process())
+  {
     alpha4.writeDisplay();
+    bar.writeDisplay();
+    matrix.writeDisplay();
   }
 }

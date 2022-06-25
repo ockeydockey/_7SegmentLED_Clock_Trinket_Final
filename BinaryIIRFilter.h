@@ -18,9 +18,6 @@ public:
     /// @returns New filtered value
     uint16_t addSample(uint16_t value)
     {
-        // m_accumulator = static_cast<uint16>(static_cast<uint32_t>(m_accumulator) + (static_cast<uint32_t>(value) - m_accumulator) >> m_attenuationFactor);
-        // return m_accumulator;
-
         uint32_t out = getValue();
         m_accumulator = m_accumulator - out + value;
         return static_cast<uint16_t>(out);

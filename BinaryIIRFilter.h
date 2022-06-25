@@ -3,6 +3,7 @@
 #include "arduino.h"
 
 /// @brief Binary Single Stage IIR Filter
+/// @details Based on https://stackoverflow.com/questions/38918530/simple-low-pass-filter-in-fixed-point
 class BinaryIIRFilter
 {
 public:

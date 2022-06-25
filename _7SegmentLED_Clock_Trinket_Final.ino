@@ -1,24 +1,26 @@
 /**
- * Designed to work with ATTinyCore (Version 1.3.3):
- * http://www.leonardomiliani.com/repository/package_leonardomiliani.com_index.json
- * 
- * Board: "ATtiny25/45/85"
- * millis()/micros(): "Enabled"
- * Timer 1 Clock: "CPU"
- * Clock: "8 MHz (internal)"
- * Chip: "ATtiny85"
- * Save EEPROM: "EEPROM retained"
- * LTO (1.6.11+ only): "Enabled"
- * B.O.D. Level: "B.O.D. Enables (4.3v)"
- * 
- * Programmer: "USBTinyISP"
- */
+  * Designed to work with ATTinyCore (Version 1.3.3):
+  * https://github.com/SpenceKonde/ATTinyCore
+  *
+  * Board: "ATtiny25/45/85"
+  * millis()/micros(): "Enabled"
+  * Timer 1 Clock: "CPU"
+  * Clock: "8 MHz (internal)"
+  * Chip: "ATtiny85"
+  * Save EEPROM: "EEPROM retained"
+  * LTO (1.6.11+ only): "Enabled"
+  * B.O.D. Level: "B.O.D. Enables (4.3v)"
+  *
+  * Programmer: "USBTinyISP"
+  *
+  * NOTE: Don't forget to "Burn Bootloader" to set fuses on CPU
+*/
 #include <TinyWireM.h>  // Version 1.0.1
 #include <TinyRTClib.h> // Version 1.0.0
 #include <EEPROM.h>     // Version 2.0.0
 
-#include <Adafruit_LEDBackpack.h>
-#include <Adafruit_GFX.h>
+#include <Adafruit_LEDBackpack.h> // Version 1.1.6
+#include <Adafruit_GFX.h>         // Version 1.7.5
 
 #define DST_PIN 3
 #define LIGHTSENSOR A2  // This is really A2 ;)
@@ -63,10 +65,10 @@ void setup() {
     EEPROM.put(0, now.unixtime());
   }
 
-//  brightness = 16;
-//  bar.setBrightness(brightness);
-//  alpha4.setBrightness(brightness/2);
-//  matrix.setBrightness(brightness);
+  //  brightness = 16;
+  //  bar.setBrightness(brightness);
+  //  alpha4.setBrightness(brightness/2);
+  //  matrix.setBrightness(brightness);
 }
 
 void loop() {
@@ -148,124 +150,124 @@ void loop() {
 
     matrix.writeDisplay();
 
-//    dateToggle = ~ dateToggle;
-//    if (dateToggle == 0) {
-      switch (dow) {
-        // Sunday
-        case 0:
-          dateChar1 = 'S';
-          dateChar2 = 'u';
-          break;
-        // Monday
-        case 1:
-          dateChar1 = 'M';
-          dateChar2 = 'o';
-          break;
-        // Tuesday
-        case 2:
-          dateChar1 = 'T';
-          dateChar2 = 'u';
-          break;
-        //Wednesday
-        case 3:
-          dateChar1 = 'W';
-          dateChar2 = 'e';
-          break;
-        // Thursday
-        case 4:
-          dateChar1 = 'T';
-          dateChar2 = 'h';
-          break;
-        // Friday
-        case 5:
-          dateChar1 = 'F';
-          dateChar2 = 'r';
-          break;
-        // Saturday
-        case 6:
-          dateChar1 = 'S';
-          dateChar2 = 'a';
-          break;
-        default:
-          dateChar1 = '-';
-          dateChar2 = '-';
-          break;
-      }
-      
-// Possibly just show the numeric month with a "." in the middle      
-      
-//    } else {
-//      switch (now.month()) {
-//        case 1:
-//          // JAnuary
-//          dateChar1 = 'J';
-//          dateChar2 = 'A';
-//          break;
-//        case 2:
-//          // FeBruary
-//          dateChar1 = 'F';
-//          dateChar2 = 'B';
-//          break;
-//        case 3:
-//          // MaRch
-//          dateChar1 = 'M';
-//          dateChar2 = 'R';
-//          break;
-//        case 4:
-//          // APril
-//          dateChar1 = 'A';
-//          dateChar2 = 'P';
-//          break;
-//        case 5:
-//          // MaY
-//          dateChar1 = 'M';
-//          dateChar2 = 'Y';
-//          break;
-//        case 6:
-//          // JunE
-//          dateChar1 = 'J';
-//          dateChar2 = 'N';
-//          break;
-//        case 7:
-//          // JuLy
-//          dateChar1 = 'J';
-//          dateChar2 = 'L';
-//          break;
-//        case 8:
-//          // AUgust
-//          dateChar1 = 'A';
-//          dateChar2 = 'U';
-//          break;
-//        case 9:
-//          // SePtember
-//          dateChar1 = 'S';
-//          dateChar2 = 'P';
-//          break;
-//        case 10:
-//          // OCtober
-//          dateChar1 = 'O';
-//          dateChar2 = 'C';
-//          break;
-//        case 11:
-//          // NOvember
-//          dateChar1 = 'N';
-//          dateChar2 = 'O';
-//          break;
-//        case 12:
-//          // DeCember
-//          dateChar1 = 'D';
-//          dateChar2 = 'C';
-//          break;
-//        default:
-//          dateChar1 = '-';
-//          dateChar2 = '-';
-//          break;
-//      }
-//    }
+    //    dateToggle = ~ dateToggle;
+    //    if (dateToggle == 0) {
+    switch (dow) {
+      // Sunday
+      case 0:
+        dateChar1 = 'S';
+        dateChar2 = 'u';
+        break;
+      // Monday
+      case 1:
+        dateChar1 = 'M';
+        dateChar2 = 'o';
+        break;
+      // Tuesday
+      case 2:
+        dateChar1 = 'T';
+        dateChar2 = 'u';
+        break;
+      //Wednesday
+      case 3:
+        dateChar1 = 'W';
+        dateChar2 = 'e';
+        break;
+      // Thursday
+      case 4:
+        dateChar1 = 'T';
+        dateChar2 = 'h';
+        break;
+      // Friday
+      case 5:
+        dateChar1 = 'F';
+        dateChar2 = 'r';
+        break;
+      // Saturday
+      case 6:
+        dateChar1 = 'S';
+        dateChar2 = 'a';
+        break;
+      default:
+        dateChar1 = '-';
+        dateChar2 = '-';
+        break;
+    }
+
+    // Possibly just show the numeric month with a "." in the middle
+
+    //    } else {
+    //      switch (now.month()) {
+    //        case 1:
+    //          // JAnuary
+    //          dateChar1 = 'J';
+    //          dateChar2 = 'A';
+    //          break;
+    //        case 2:
+    //          // FeBruary
+    //          dateChar1 = 'F';
+    //          dateChar2 = 'B';
+    //          break;
+    //        case 3:
+    //          // MaRch
+    //          dateChar1 = 'M';
+    //          dateChar2 = 'R';
+    //          break;
+    //        case 4:
+    //          // APril
+    //          dateChar1 = 'A';
+    //          dateChar2 = 'P';
+    //          break;
+    //        case 5:
+    //          // MaY
+    //          dateChar1 = 'M';
+    //          dateChar2 = 'Y';
+    //          break;
+    //        case 6:
+    //          // JunE
+    //          dateChar1 = 'J';
+    //          dateChar2 = 'N';
+    //          break;
+    //        case 7:
+    //          // JuLy
+    //          dateChar1 = 'J';
+    //          dateChar2 = 'L';
+    //          break;
+    //        case 8:
+    //          // AUgust
+    //          dateChar1 = 'A';
+    //          dateChar2 = 'U';
+    //          break;
+    //        case 9:
+    //          // SePtember
+    //          dateChar1 = 'S';
+    //          dateChar2 = 'P';
+    //          break;
+    //        case 10:
+    //          // OCtober
+    //          dateChar1 = 'O';
+    //          dateChar2 = 'C';
+    //          break;
+    //        case 11:
+    //          // NOvember
+    //          dateChar1 = 'N';
+    //          dateChar2 = 'O';
+    //          break;
+    //        case 12:
+    //          // DeCember
+    //          dateChar1 = 'D';
+    //          dateChar2 = 'C';
+    //          break;
+    //        default:
+    //          dateChar1 = '-';
+    //          dateChar2 = '-';
+    //          break;
+    //      }
+    //    }
     if (brightness > 1) {
       alpha4.writeDigitAscii(0, dateChar1);
       alpha4.writeDigitAscii(1, dateChar2);
-      
+
       if (day >= 10) {
         alpha4.writeDigitAscii(2, ((char)(day / 10)) | 0x30);
       } else {

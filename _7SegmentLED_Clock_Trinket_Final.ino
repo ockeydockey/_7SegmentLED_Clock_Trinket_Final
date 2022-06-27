@@ -15,12 +15,12 @@
   *
   * NOTE: Don't forget to "Burn Bootloader" to set fuses on CPU
 */
-#include <TinyWireM.h>  // Version 1.0.1
-#include <TinyRTClib.h> // Version 1.0.0
-#include <EEPROM.h>     // Version 2.0.0
+#include <TinyWireM.h>   // Version 1.0.1
+#include <TinyRTClib.h>  // Version 1.0.0
+#include <EEPROM.h>      // Version 2.0.0
 
-#include <Adafruit_LEDBackpack.h> // Version 1.1.6
-#include <Adafruit_GFX.h>         // Version 1.7.5
+#include <Adafruit_LEDBackpack.h>  // Version 1.1.6
+#include <Adafruit_GFX.h>          // Version 1.7.5
 
 #include "BinaryIIRFilter.h"
 #include "MillisTimer.h"
@@ -34,14 +34,14 @@ Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 
 /// @brief Low Pass Filter for light sensor ADC
 /// @details Data for this filter needs to be sampled at a consistent rate
-BinaryIIRFilter lightSensorLPF{3U};
+BinaryIIRFilter lightSensorLPF{ 3U };
 
-MillisTimer adcSampleTimer{50UL, true};
-MillisTimer displayUpdateTimer{100UL, true};
-MillisTimer dotsToggleTimer{500UL, true};
-MillisTimer dateTimeUpdateTimer{1000UL, true};
-MillisTimer barFrameTimer{100UL, true};
-MillisTimer barBlankingTimer{3000UL, false};
+MillisTimer adcSampleTimer{ 20UL, true };
+MillisTimer displayUpdateTimer{ 100UL, true };
+MillisTimer dotsToggleTimer{ 500UL, true };
+MillisTimer dateTimeUpdateTimer{ 1000UL, true };
+MillisTimer barFrameTimer{ 100UL, true };
+MillisTimer barBlankingTimer{ 1700UL, false };
 
 RTC_DS1307 rtc;
 DateTime now;
@@ -87,53 +87,28 @@ void setup() {
 
 void loop() {
   // Sample light sensor and set screen brightness
-  if (adcSampleTimer.process())
-  {
+  if (adcSampleTimer.process()) {
     // Check the light levels from the light sensor,
     // then set the screen birghtness to match
     brightness = map(constrain(lightSensorLPF.addSample(analogRead(LIGHTSENSOR)), 0, 780), 0, 780, 0, 16);
     bar.setBrightness(brightness);
-    alpha4.setBrightness(brightness / 3);
-    matrix.setBrightness(brightness);
-
-    // Only display date if the brightness is above a certain level
-    if (brightness > 1) {
-      alpha4.writeDigitAscii(0, dateChar1);
-      alpha4.writeDigitAscii(1, dateChar2);
-
-      if (day >= 10) {
-        alpha4.writeDigitAscii(2, ((char)(day / 10)) | 0x30);
-      } else {
-        alpha4.writeDigitRaw(2, 0x00);
-      }
-      alpha4.writeDigitAscii(3, (day % 10) | 0x30);
-    } else {
-      alpha4.clear();
-    }
   }
 
   // Larson scanner animation
-  if (barFrameTimer.process())
-  {
+  if (barFrameTimer.process()) {
     barBlankingTimer.process();
-    if (barBlankingTimer.isRunning())
-    {
+    if (barBlankingTimer.isRunning()) {
       bar.setBar(11, LED_OFF);
       bar.setBar(12, LED_OFF);
-    }
-    else
-    {
+    } else {
       bar.setBar(23 - b, LED_OFF);
       bar.setBar(b, LED_OFF);
 
       b = (b + 1);
-      if (b >= 12)
-      {
+      if (b >= 12) {
         barBlankingTimer.start();
         b = 0;
-      }
-      else
-      {
+      } else {
         bar.setBar(b, LED_YELLOW);
         bar.setBar(23 - b, LED_YELLOW);
       }
@@ -306,12 +281,28 @@ void loop() {
     //          break;
     //      }
     //    }
-    
   }
 
   // Only push data to the displays once every interval to prevent glitching
-  if (displayUpdateTimer.process())
-  {
+  if (displayUpdateTimer.process()) {
+    alpha4.setBrightness(brightness / 3);
+    matrix.setBrightness(brightness);
+
+    // Only display date if the brightness is above a certain level
+    if (brightness > 1) {
+      alpha4.writeDigitAscii(0, dateChar1);
+      alpha4.writeDigitAscii(1, dateChar2);
+
+      if (day >= 10) {
+        alpha4.writeDigitAscii(2, ((char)(day / 10)) | 0x30);
+      } else {
+        alpha4.writeDigitRaw(2, 0x00);
+      }
+      alpha4.writeDigitAscii(3, (day % 10) | 0x30);
+    } else {
+      alpha4.clear();
+    }
+
     alpha4.writeDisplay();
     bar.writeDisplay();
     matrix.writeDisplay();

@@ -1,5 +1,6 @@
 profiles:
   attiny85:
+    notes: ATTiny 85; 8MHz CPU speed; no XTAL; 5V power supply
     fqbn: ATTinyCore:avr:attinyx5:LTO=enable,TimerClockSource=default,chip=85,clock=8internal,eesave=aenable,bod=4v3,millis=enabled
     platforms:
       - platform: ATTinyCore:avr (1.5.2)

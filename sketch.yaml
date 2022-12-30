@@ -3,6 +3,8 @@ profiles:
     fqbn: ATTinyCore:avr:attinyx5:LTO=enable,TimerClockSource=default,chip=85,clock=8internal,eesave=aenable,bod=4v3,millis=enabled
     platforms:
       - platform: ATTinyCore:avr (1.5.2)
+        platform_index_url: http://drazzy.com/package_drazzy.com_index.json
+      - platform: arduino:avr (1.8.6)
     libraries:
       - TinyWireM (1.1.1)
       - TinyRTCLib (1.1.0)

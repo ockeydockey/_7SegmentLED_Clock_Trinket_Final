@@ -1,0 +1,41 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build with Arduino CLI",
+            "group": "build",
+            "type": "shell",
+            "command": "arduino-cli",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "args": [
+                "compile",
+                "--profile", "attiny85",
+                "--output-dir", "output"
+            ],
+            "presentation": {
+                "echo": true,
+                "clear": true,
+                "showReuseMessage": false,
+                "group": "ArduinoCLI",
+                "revealProblems": "onProblem"
+            },
+            "problemMatcher": {
+                "owner": "ArduinoCLI",
+                "source": "ArduinoCLI",
+                "fileLocation": "autoDetect",
+                "pattern": {
+                    "regexp": "^(.*?):(\\d+)(?::(\\d+))?:\\s*(warning|error|note|\\S+):\\s*(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+    ]
+}

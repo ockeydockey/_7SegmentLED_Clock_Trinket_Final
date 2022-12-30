@@ -1,0 +1,6 @@
+{
+    "configuration": "LTO=enable,TimerClockSource=default,chip=85,clock=8internal,eesave=aenable,bod=4v3,millis=enabled",
+    "board": "ATTinyCore:avr:attinyx5",
+    "programmer": "usbtinyisp2",
+    "sketch": "_7SegmentLED_Clock_Trinket_Final.ino"
+}
